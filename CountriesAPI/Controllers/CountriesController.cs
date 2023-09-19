@@ -71,19 +71,19 @@ public class CountriesController : ControllerBase
         return Ok(countries.Select(x => x.Name.Common));
     }
 
-    public IEnumerable<Country> FilterByName(IEnumerable<Country> countries, string filter) 
+    internal IEnumerable<Country> FilterByName(IEnumerable<Country> countries, string filter) 
     {
         return countries.Where(x => x.Name.Common.ToLower().Contains(filter.ToLower()));
     }
 
-    public IEnumerable<Country> FilterByPopulation(IEnumerable<Country> countries, string filter) 
+    internal IEnumerable<Country> FilterByPopulation(IEnumerable<Country> countries, string filter) 
     {
         var populationToMlns = long.Parse(filter + "000000");
 
         return countries.Where(x => x.Population < populationToMlns);
     }
 
-    public IOrderedEnumerable<Country> SortByName(IEnumerable<Country> countries, string sort) 
+    internal IOrderedEnumerable<Country> SortByName(IEnumerable<Country> countries, string sort) 
     {
         if (sort.ToLower() == SortConstants.Ascending)
         {
@@ -92,7 +92,7 @@ public class CountriesController : ControllerBase
         return countries.OrderByDescending(x => x.Name.Common);
     }
 
-    public IEnumerable<Country> GetFirstNRecords(IEnumerable<Country> countries, int limit, int? offset) 
+    internal IEnumerable<Country> GetFirstNRecords(IEnumerable<Country> countries, int limit, int? offset) 
     {
         if (offset.HasValue)
         {
