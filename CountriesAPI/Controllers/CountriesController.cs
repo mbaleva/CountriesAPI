@@ -44,4 +44,15 @@ public class CountriesController : ControllerBase
         }
         return countries.OrderByDescending(x => x.Name.Common);
     }
+
+    private IEnumerable<Country> GetFirstNRecords(IEnumerable<Country> countries, int limit, int? offset) 
+    {
+        if (offset.HasValue)
+        {
+            return countries.Skip(offset.Value)
+                .Take(limit);
+        }
+
+        return countries.Take(limit);
+    }
 }
