@@ -1,5 +1,6 @@
 ﻿using CountriesAPI.Clients;
 using CountriesAPI.Constants;
+using CountriesAPI.Helpers;
 using CountriesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,10 +19,56 @@ public class CountriesController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetCountries(string filter, string sort, int limit, int offset) 
+    public async Task<IActionResult> GetCountries(string? filter, string? sort, int? limit, int? offset) 
     {
         var countries = await _client.GetAll();
-        return Ok();
+
+        if (!string.IsNullOrEmpty(filter))
+        {
+            var areBothConditionsPresented = filter.Contains("and");
+
+            if (areBothConditionsPresented)
+            {
+                var filters = FilteringHelper.ExtractNameAndPopulationFromFilter(filter);
+
+                countries = FilterByName(countries, filters.Name);
+                countries = FilterByPopulation(countries, filters.Population);
+            }
+
+            if (filter.StartsWith("contains"))
+            {
+                var filterParams = filter.Replace("(", " ")
+                    .Replace(")", " ")
+                    .Replace(",", string.Empty)
+                    .Trim()
+                    .Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+                countries = FilterByName(countries, filterParams[filterParams.Length - 1]); 
+            }
+
+            if (filter.StartsWith("lessThan"))
+            {
+                var filterParams = filter.Replace("(", " ")
+                    .Replace(")", " ")
+                    .Replace(",", string.Empty)
+                    .Trim()
+                    .Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+                countries = FilterByPopulation(countries, filterParams[filterParams.Length - 1]);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(sort) && (sort == SortConstants.Ascending || sort == SortConstants.Descending))
+        {
+            countries = SortByName(countries, sort);
+        }
+
+        if (limit.HasValue)
+        {
+            countries = GetFirstNRecords(countries, limit.Value, offset);
+        }
+
+        return Ok(countries.Select(x => x.Name.Common));
     }
 
     private IEnumerable<Country> FilterByName(IEnumerable<Country> countries, string filter) 
