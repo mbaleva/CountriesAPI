@@ -1,4 +1,5 @@
 ﻿using CountriesAPI.Clients;
+using CountriesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CountriesAPI.Controllers;
@@ -19,6 +20,12 @@ public class CountriesController : ControllerBase
     public async Task<IActionResult> GetCountries(string filter, string sort, int limit, int offset) 
     {
         var countries = await _client.GetAll();
+        
         return Ok();
+    }
+
+    private IEnumerable<Country> FilterByName(IEnumerable<Country> countries, string filter) 
+    {
+        return countries.Where(x => x.Name.Common.ToLower().Contains(filter.ToLower()));
     }
 }
