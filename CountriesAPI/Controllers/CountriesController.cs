@@ -1,4 +1,5 @@
 ﻿using CountriesAPI.Clients;
+using CountriesAPI.Constants;
 using CountriesAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,5 +34,14 @@ public class CountriesController : ControllerBase
         var populationToMlns = long.Parse(filter + "000000");
 
         return countries.Where(x => x.Population < populationToMlns);
+    }
+
+    private IOrderedEnumerable<Country> SortByName(IEnumerable<Country> countries, string sort) 
+    {
+        if (sort.ToLower() == SortConstants.Ascending)
+        {
+            return countries.OrderBy(x => x.Name.Common);
+        }
+        return countries.OrderByDescending(x => x.Name.Common);
     }
 }
