@@ -20,12 +20,18 @@ public class CountriesController : ControllerBase
     public async Task<IActionResult> GetCountries(string filter, string sort, int limit, int offset) 
     {
         var countries = await _client.GetAll();
-        
         return Ok();
     }
 
     private IEnumerable<Country> FilterByName(IEnumerable<Country> countries, string filter) 
     {
         return countries.Where(x => x.Name.Common.ToLower().Contains(filter.ToLower()));
+    }
+
+    private IEnumerable<Country> FilterByPopulation(IEnumerable<Country> countries, string filter) 
+    {
+        var populationToMlns = long.Parse(filter + "000000");
+
+        return countries.Where(x => x.Population < populationToMlns);
     }
 }
