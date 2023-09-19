@@ -1,6 +1,8 @@
 ﻿using CountriesAPI.Clients;
 using Microsoft.AspNetCore.Mvc;
 
+namespace CountriesAPI.Controllers;
+
 [Route("/countries")]
 public class CountriesController : ControllerBase
 {

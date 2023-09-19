@@ -11,7 +11,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(x =>
 {
-    return RestService.For<ICountriesClient>("https://restcountries.com/v3.1");
+    var apiUrl = builder.Configuration.GetValue<string>("ApiUrl");
+
+    return RestService.For<ICountriesClient>(apiUrl ?? default!);
 });
 
 var app = builder.Build();
